@@ -4,6 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.widget.TextView;
 
+import com.fs.ballerinachatapp.MainActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -15,18 +20,16 @@ import okhttp3.WebSocketListener;
 public class BallerinaWebSocketListener extends WebSocketListener {
     private static final int NORMAL_CLOSURE_STATUS = 1000;
     private TextView tv;
-    private Activity activity;
+    public MainActivity activity;
 
-    public BallerinaWebSocketListener(Activity activity, TextView tv){
+    public BallerinaWebSocketListener(MainActivity activity){
         super();
         this.activity = activity;
-        this.tv = tv;
     }
 
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
-        webSocket.send("Hello, Ballerina!");
-        webSocket.send("What's up ?");
+        webSocket.send("Hello, Welcome to the Ballerina Hackathon Chat!");
         //webSocket.close(NORMAL_CLOSURE_STATUS, "Bye Bye !");
     }
 
@@ -38,7 +41,7 @@ public class BallerinaWebSocketListener extends WebSocketListener {
     @Override
     public void onClosing(WebSocket webSocket, int code, String reason) {
         webSocket.close(NORMAL_CLOSURE_STATUS, null);
-        outPut("Closing" + code + " / " + reason);
+        outPut("Good Bye!");
     }
 
     @Override
@@ -47,12 +50,42 @@ public class BallerinaWebSocketListener extends WebSocketListener {
     }
 
     private void outPut(final String text) {
-        this.activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                tv.setText(tv.getText().toString() + "\n\n" + text);
+
+        try {
+            final JSONObject jb = new JSONObject(text);
+            String chatMsg;
+            Boolean isUser;
+            switch (jb.getString("message-type")){
+                case "signin":
+                    this.activity.token = jb.getString("access_token");
+                    this.activity.username = this.activity.usernameEditText.getText().toString();
+                    this.activity.setupChat();
+                    break;
+                case "chat":
+                    if (this.activity.username.equals(jb.getString("from"))){
+                        chatMsg = "me:/n" + jb.getString("message");
+                        isUser = true;
+                    }else{
+                        chatMsg = jb.getString("from") + "/n" + jb.getString("message");
+                        isUser = false;
+                    }
+                    this.activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                activity.receiveChatMessage(jb.getString("message"),false);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    break;
+                default:break;
             }
-        });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 }
 

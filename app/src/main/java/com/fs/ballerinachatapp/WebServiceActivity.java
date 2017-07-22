@@ -40,7 +40,7 @@ public class WebServiceActivity extends AppCompatActivity {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                start();
+                //start();
             }
         });
 
@@ -59,10 +59,10 @@ public class WebServiceActivity extends AppCompatActivity {
         });
     }
 
-    private void start(){
-        Request request = new Request.Builder().url(socketURL).build();
-        BallerinaWebSocketListener ballerinaWebSocketListener = new BallerinaWebSocketListener(this, output);
-        ws = client.newWebSocket(request, ballerinaWebSocketListener);
-        client.dispatcher().executorService().shutdown();
-    }
+//    private void start(){
+//        Request request = new Request.Builder().url(socketURL).build();
+//        BallerinaWebSocketListener ballerinaWebSocketListener = new BallerinaWebSocketListener(this, output);
+//        ws = client.newWebSocket(request, ballerinaWebSocketListener);
+//        client.dispatcher().executorService().shutdown();
+//    }
 }
