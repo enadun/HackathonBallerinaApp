@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 private static final String TAG = "ChatActivity";
 
     //public static final String socketURL = "ws://echo.websocket.org";
-    public static final String socketURL = "ws://10.10.10.220:9090/echo-server/ws";
+    public static final String socketURL = "ws://10.10.10.87:9090/fsociety/chat-service";
 
     private ChatArrayAdapter chatArrayAdapter;
     private ListView listView;
@@ -97,7 +97,7 @@ private static final String TAG = "ChatActivity";
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //sign in request
+                ws.send(createSignInString(usernameEditText.getText().toString()));
             }
         });
 
@@ -113,7 +113,7 @@ private static final String TAG = "ChatActivity";
     }
 
     public void setupChat(){
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_main);
 
         buttonSend = (Button) findViewById(R.id.send);
 
@@ -126,8 +126,9 @@ private static final String TAG = "ChatActivity";
         chatText.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    String msg = createResponseString(username);
+                    String msg = createResponseString(chatText.getText().toString());
                     ws.send(msg);
+                    chatText.setText("");
                     return true;
                 }
                 return false;
@@ -136,8 +137,9 @@ private static final String TAG = "ChatActivity";
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                String msg = createResponseString(username);
+                String msg = createResponseString(chatText.getText().toString());
                 ws.send(msg);
+                chatText.setText("");
             }
         });
 
@@ -154,12 +156,25 @@ private static final String TAG = "ChatActivity";
         });
     }
 
-    public String createResponseString(String username) {
+    public String createSignInString(String username) {
 
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("message-type","signin");
             jsonObject.put("username", username);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
+    }
+
+    public String createResponseString(String msg) {
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("message-type","chat");
+            jsonObject.put("token", token);
+            jsonObject.put("message", msg);
         } catch (JSONException e) {
             e.printStackTrace();
         }

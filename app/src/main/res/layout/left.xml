@@ -18,15 +18,4 @@
         android:textColor="#000"
         android:textSize="25dp"/>
 
-    <TextView
-        android:id="@+id/username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/msgr"
-        android:layout_marginBottom="5dp"
-        android:paddingBottom="8dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="5dp"
-        android:textSize="15dp"/>
 </RelativeLayout>

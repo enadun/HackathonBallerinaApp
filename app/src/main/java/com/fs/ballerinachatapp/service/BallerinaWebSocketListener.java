@@ -5,6 +5,7 @@ import android.content.Context;
 import android.widget.TextView;
 
 import com.fs.ballerinachatapp.MainActivity;
+import com.fs.ballerinachatapp.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +42,12 @@ public class BallerinaWebSocketListener extends WebSocketListener {
     @Override
     public void onClosing(WebSocket webSocket, int code, String reason) {
         webSocket.close(NORMAL_CLOSURE_STATUS, null);
-        outPut("Good Bye!");
+        this.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.setContentView(R.layout.activity_login);
+            }
+        });
     }
 
     @Override
@@ -53,30 +59,31 @@ public class BallerinaWebSocketListener extends WebSocketListener {
 
         try {
             final JSONObject jb = new JSONObject(text);
-            String chatMsg;
-            Boolean isUser;
+            final String chatMsg;
+            final Boolean isUser;
             switch (jb.getString("message-type")){
                 case "signin":
-                    this.activity.token = jb.getString("access_token");
+                    this.activity.token = jb.getString("token");
                     this.activity.username = this.activity.usernameEditText.getText().toString();
-                    this.activity.setupChat();
+                    this.activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.setupChat();
+                        }
+                    });
                     break;
                 case "chat":
-                    if (this.activity.username.equals(jb.getString("from"))){
-                        chatMsg = "me:/n" + jb.getString("message");
+                    if (this.activity.username.equals(jb.getString("username"))){
+                        chatMsg = "me:\n" + jb.getString("message");
                         isUser = true;
                     }else{
-                        chatMsg = jb.getString("from") + "/n" + jb.getString("message");
+                        chatMsg = jb.getString("username") + ":\n" + jb.getString("message");
                         isUser = false;
                     }
                     this.activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                activity.receiveChatMessage(jb.getString("message"),false);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                                activity.receiveChatMessage(chatMsg,isUser);
                         }
                     });
                     break;
@@ -85,7 +92,6 @@ public class BallerinaWebSocketListener extends WebSocketListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 }
 
