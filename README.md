@@ -7,3 +7,5 @@ The following tutorials were used as references.
 
 * http://www.viralandroid.com/2016/06/chat-messaging-app-xml-ui-design-for-android.html
 * https://medium.com/@ssaurel/learn-to-use-websockets-on-android-with-okhttp-ba5f00aea988
+
+This project is associate with [HackathonBallerinaServer](https://github.com/enadun/HackathonBallerinaServer) project.
